@@ -1,2 +1,43 @@
 # web.test# web.test
 # web.test
+
+# 手打蕎麦 久呂無木 Webサイト
+
+ビルド不要のHTML・CSS・JavaScriptによる完成データ。PC・タブレット・スマートフォン対応。写真の外部取得や外部フォントへの依存はなく、図案を含むすべての表示素材を同梱しています。
+
+## 公開方法
+
+このフォルダ内のHTML、assetsフォルダ、robots.txtを、そのままWebサーバーの公開ディレクトリへアップロードします。トップはindex.html。ルートでもサブディレクトリでも使用できます。公開時にNode.js、Python、データベースは不要です。docsとREADME.mdは管理者用で、公開サーバーに置く必要はありません。
+
+確認用：`python3 -m http.server 8080`。
+
+今回は完成データの作成までで、店舗サイト自体の公開・ドメイン取得は行っていません。
+
+## ページ
+
+- index.html：トップ
+- about.html：店名・蕎麦への想い・味わい方
+- menu.html：昼の蕎麦・夜の蕎麦前と日本酒
+- journal.html：お知らせ、店舗ブログへの導線
+- information.html：住所・営業時間・定休日・アクセス
+- reservation.html：電話予約、ご来店にあたって
+- faq.html：よくある質問
+- privacy.html：情報収集と外部サービスの説明
+
+## 実装
+
+電話はtelリンク、地図はGoogleマップ検索、予約は店舗の電話へ接続します。オンライン予約や未稼働のお問い合わせフォームは設置していません。営業時間は店舗ブログのL.O.表記を使用。メニューの価格は確定できないため、店頭確認の案内にしています。
+
+JavaScript無効時もナビゲーションを表示します。モバイルメニューはEscapeで閉じ、フォーカスをボタンへ戻します。FAQはネイティブのdetails要素です。動きを減らすOS設定に対応します。
+
+meta description、OGタイトル・説明、JSON-LDの店舗情報、favicon、robots.txtを設定済み。公開先ドメインが未指定のため、架空のcanonicalやog:urlは入れていません。公開先が決まった後、必要に応じて各ページの絶対URL、OG画像URL、サイトマップを追加できます。
+
+## 更新
+
+共通スタイル：assets/style.css。モバイルメニュー：assets/site.js。ページ本文はそれぞれのHTMLを編集します。営業時間等は複数ページに載せているため、変更時はトップ・店舗案内・FAQ・フッター前の電話案内も更新してください。営業日・臨時休業は店舗ブログで更新する運用です。
+
+調査根拠と情報の扱いはdocs/RESEARCH.md、検証結果はdocs/VALIDATION.mdを参照。docsのプレビューは検証した表示の画像です。
+
+## GitHubからの確認
+
+緑の「Code」ボタンから「Download ZIP」を選択し、ZIPを展開します。preview.htmlは画像と全8ページを同梱した単体の確認用ファイルです。MacでSafariまたはChromeを指定して開いてください。公開用にはindex.htmlとassets、および各HTMLを使用してください。
