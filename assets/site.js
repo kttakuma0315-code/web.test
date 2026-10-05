@@ -6,7 +6,6 @@
   const nav = document.querySelector('#navigation');
   const activeAnimations = new Set();
   let observer;
-  let navigating = false;
   let scrollFrame = 0;
 
   function closeNav() {
@@ -60,20 +59,20 @@
     observer?.disconnect();
     activeAnimations.forEach(animation => animation.cancel());
     activeAnimations.clear();
-    navigating = false;
   }
   function initializeMotion() {
     resetMotion();
     queueProgress();
     if (motionPreference.matches) return;
     const main = document.querySelector('#main');
-    animate(main, [{ opacity: 0 }, { opacity: 1 }], { duration: 520 });
+    // The page itself always remains opaque, including during navigation.
+    animate(main, [{ transform: 'translateY(6px)' }, { transform: 'translateY(0)' }], { duration: 420 });
     document.querySelectorAll('.hero-copy > *').forEach((element, index) => {
-      reveal(element, Math.min(index * 55, 220));
+      animate(element, [{ transform: 'translateY(10px)' }, { transform: 'translateY(0)' }], { delay: Math.min(index * 55, 220), fill: 'backwards' });
     });
     animate(document.querySelector('.hero-art img'), [
-      { opacity: 0, transform: 'scale(1.025)' },
-      { opacity: 1, transform: 'scale(1)' },
+      { transform: 'scale(1.025)' },
+      { transform: 'scale(1)' },
     ], { duration: 1150 });
     if (!('IntersectionObserver' in window)) return;
     observer = new IntersectionObserver(entries => {
@@ -88,7 +87,11 @@
       '.intro > *:not(.intro-side)', '.split > *', '.section-heading',
       '.time-card', '.three-cards > article', '.news-row', '.visit-item',
       '.reservation-box', '.faq-list > details', '.page-head > *',
-    ].join(',')).forEach(element => observer.observe(element));
+    ].join(',')).forEach(element => {
+      // Already visible content must never disappear and restart its entrance.
+      const rect = element.getBoundingClientRect();
+      if (rect.top >= window.innerHeight) observer.observe(element);
+    });
   }
 
   const progress = document.createElement('div');
@@ -107,35 +110,11 @@
   window.addEventListener('scroll', queueProgress, { passive: true });
   window.addEventListener('load', queueProgress, { once: true });
 
-  // Preserve native behavior for anchors, calls, external links and new tabs.
-  document.addEventListener('click', event => {
-    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    const link = event.target.closest('a[href]');
-    if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
-    const href = link.getAttribute('href');
-    const previewPage = /^#page-[a-z]+$/.test(href);
-    if (href.startsWith('#') && !previewPage) return;
-    let destination;
-    try { destination = new URL(link.href, window.location.href); } catch { return; }
-    if (!previewPage && (
-      destination.origin !== window.location.origin ||
-      !['http:', 'https:', 'file:'].includes(destination.protocol) ||
-      !destination.pathname.endsWith('.html') ||
-      destination.pathname === window.location.pathname
-    )) return;
-    if (previewPage && destination.hash === window.location.hash) return;
-    if (motionPreference.matches || typeof document.querySelector('#main')?.animate !== 'function') return;
-    event.preventDefault();
-    if (navigating) return;
-    navigating = true;
-    const main = document.querySelector('#main');
-    animate(main, [{ opacity: 1 }, { opacity: 0 }], {
-      duration: 160, easing: 'ease-out', fill: 'forwards',
-    });
-    // A short fixed fallback guarantees navigation even if animation is cancelled.
-    window.setTimeout(() => window.location.assign(destination.href), 170);
+  // Native links avoid any blank intermediate document. Supporting browsers use
+  // the CSS View Transition; other browsers navigate normally without a fade-out.
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) initializeMotion();
   });
-  window.addEventListener('pageshow', initializeMotion);
   window.addEventListener('kuromugi:pagechange', initializeMotion);
   motionPreference.addEventListener('change', initializeMotion);
   initializeMotion();
