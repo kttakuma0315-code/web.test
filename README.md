@@ -41,3 +41,11 @@ meta description、OGタイトル・説明、JSON-LDの店舗情報、favicon、
 ## GitHubからの確認
 
 緑の「Code」ボタンから「Download ZIP」を選択し、ZIPを展開します。preview.htmlは画像と全8ページを同梱した単体の確認用ファイルです。MacでSafariまたはChromeを指定して開いてください。公開用にはindex.htmlとassets、および各HTMLを使用してください。
+
+## 動きの演出
+
+ページ遷移は約0.16秒のフェードアウトと約0.52秒のフェードイン。スクロールで文章・図案が18pxほど浮かび上がり、ヒーロー図案はわずかなズームで現れます。上端の細い線でページの読了位置を示します。
+
+OSの「視差効果を減らす」設定では演出を停止します。スクロールはブラウザーの通常操作のまま。外部リンク・電話・ページ内リンク・別タブ操作は通常どおりです。
+
+HTMLやCSS、JavaScriptを変更した後は、リポジトリ内で `python3 scripts/build_preview.py` を実行すると単体のpreview.htmlも更新されます。公開時にPythonは不要です。
